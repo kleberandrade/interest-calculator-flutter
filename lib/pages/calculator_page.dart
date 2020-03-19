@@ -258,17 +258,13 @@ class _CalculatorPageState extends State<CalculatorPage> {
             mainAxisAlignment: MainAxisAlignment.start,
             mainAxisSize: MainAxisSize.min,
             children: <Widget>[
-              _buildResultRow('Atraso',
-                  '${result.days} ${_controller.paymentSlip.interestPeriod.toLowerCase()}(s)'),
-              _buildResultRow(
-                  'Juros', 'R\$ ${_moneyFormat.format(result.interest)}'),
-              _buildResultRow(
-                  'Multa', 'R\$ ${_moneyFormat.format(result.fee)}'),
+              _buildResultDialogRow('Atraso', '${result.days} ${_controller.paymentSlip.interestPeriod.toLowerCase()}(s)'),
+              _buildResultDialogRow('Juros', 'R\$ ${_moneyFormat.format(result.interest)}'),
+              _buildResultDialogRow('Multa', 'R\$ ${_moneyFormat.format(result.fee)}'),
               SizedBox(height: 16),
               Divider(height: 0.1),
               SizedBox(height: 16),
-              _buildResultRow(
-                  'Total', 'R\$ ${_moneyFormat.format(result.value)}'),
+              _buildResultDialogRow('Total', 'R\$ ${_moneyFormat.format(result.value)}'),
             ],
           ),
         );
@@ -276,7 +272,7 @@ class _CalculatorPageState extends State<CalculatorPage> {
     );
   }
 
-  _buildResultRow(String label, String value) {
+  _buildResultDialogRow(String label, String value) {
     return Row(
       mainAxisSize: MainAxisSize.max,
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
