@@ -1,0 +1,23 @@
+name: interest_calculator
+description: A new Flutter project.
+version: 1.0.0+1
+
+environment:
+  sdk: ">=2.1.0 <3.0.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  flutter_localizations:
+    sdk: flutter
+  custom_radio_grouped_button: ^1.0.0
+  datetime_picker_formfield: ^1.0.0
+  intl: ^0.16.0
+  flutter_masked_text: ^0.8.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+
+flutter:
+  uses-material-design: true
