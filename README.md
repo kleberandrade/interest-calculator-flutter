@@ -2,7 +2,7 @@
 
 Aplicativo de uma calculadora de juros para boletos vencidos para disciplina de Programação Mobile, criado por Kleber de Oliveira Andrade
 
-Tutorial de criação deste app: 
+Tutorial de criação deste app: [clique aqui](https://medium.com/flutter-comunidade-br/desenvolvimento-de-uma-calculadora-de-juros-para-boletos-vencidos-44ab70fcf0cd)
 
 <p align="center">
     <img src="https://cdn-images-1.medium.com/max/1200/1*WdbItC4zKosSqygbVG4oMw.png" width="250"/>
