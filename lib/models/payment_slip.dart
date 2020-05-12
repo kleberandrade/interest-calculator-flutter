@@ -7,14 +7,14 @@ class PaymentSlip {
   double interestValue;
   String interestPeriod;
   String interestType;
-  
+
   PaymentSlip({
-    this.money,
+    this.money = 0.0,
     this.dueDate,
     this.payDate,
-    this.feeValue,
+    this.feeValue = 0.0,
     this.feeType,
-    this.interestValue,
+    this.interestValue = 0.0,
     this.interestPeriod,
     this.interestType,
   });

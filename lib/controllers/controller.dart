@@ -24,9 +24,11 @@ class Controller {
     ResultPaymentSlip result = ResultPaymentSlip();
     result.value = paymentSlip.money;
 
+    var payDate = DateTime(paymentSlip.payDate.year, paymentSlip.payDate.month, paymentSlip.payDate.day);
+    var dueDate = DateTime(paymentSlip.dueDate.year, paymentSlip.dueDate.month, paymentSlip.dueDate.day);
     // Verifica se deve aplicar os juros
     // Data de pagamento > Data de vencimento
-    if (paymentSlip.payDate.isAfter(paymentSlip.dueDate)) {
+    if (payDate.isAfter(dueDate)) {
       // Calculo da multa
       result.fee = _calculateFeeValue();
       result.value += result.fee;
@@ -57,18 +59,20 @@ class Controller {
   }
 
   _calculateInterestValue(int days) {
-    // Transform o valor em porcentagem
+    // Calcula a porcentagem de juros
     double rate = paymentSlip.interestValue / 100.0;
     if (paymentSlip.interestType == Constantes.rateLabels[0]) {
       rate = paymentSlip.interestValue / paymentSlip.money;
     }
 
-    // Calculo de juros composto
+    // Calcula o juros composto
+    // valor = montante * (1 + porcentagem)^dias
     print('value = ${paymentSlip.money} * (1 + $rate) ^ $days');
     var value = paymentSlip.money * pow(1 + rate, days);
     return value - paymentSlip.money;
   }
 
   // Função para apagar (reiniciar) as informações da tela
+  // Esta função faz parte do desafio, por isso ela não esta codificada
   void clear() {}
 }
