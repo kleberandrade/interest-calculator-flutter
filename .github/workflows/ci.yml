@@ -1,0 +1,28 @@
+name: Flutter CI
+on:
+  push:
+    branches: [master]
+  pull_request:
+permissions:
+  contents: read
+jobs:
+  web:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.41.9'
+          channel: stable
+          cache: true
+      - run: flutter pub get --enforce-lockfile
+      - run: dart format --output=none --set-exit-if-changed lib test
+      - run: flutter analyze
+      - run: flutter test --coverage
+      - run: flutter build web --release
+      - uses: actions/upload-artifact@v4
+        with:
+          name: web-build-and-coverage
+          path: |
+            build/web
+            coverage/lcov.info
