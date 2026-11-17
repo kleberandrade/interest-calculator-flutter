@@ -1,285 +1,445 @@
-import 'package:custom_radio_grouped_button/custom_radio_grouped_button.dart';
-import 'package:datetime_picker_formfield/datetime_picker_formfield.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:flutter_masked_text/flutter_masked_text.dart';
-import 'package:interest_calculator/controllers/controller.dart';
-import 'package:interest_calculator/helpers/constantes.dart';
-import 'package:interest_calculator/models/result_payment_slip.dart';
-import 'package:intl/intl.dart';
+import '../domain/calculation.dart';
+import '../domain/input.dart';
 
 class CalculatorPage extends StatefulWidget {
+  const CalculatorPage({super.key, required this.onTheme});
+  final VoidCallback onTheme;
   @override
-  _CalculatorPageState createState() => _CalculatorPageState();
+  State<CalculatorPage> createState() => _CalculatorPageState();
 }
 
 class _CalculatorPageState extends State<CalculatorPage> {
-  final _inputFieldHeight = 60.0;
-  final _formKey = GlobalKey<FormState>();
-  final _dateFormat = DateFormat('dd/MM/yyyy');
-  final _moneyFormat = NumberFormat("#,##0.00", "pt_BR");
-
-  // Lógica de negócio do aplicativo
-  Controller _controller = Controller();
+  final _form = GlobalKey<FormState>();
+  final _money = TextEditingController();
+  final _fee = TextEditingController(text: '0,00');
+  final _interest = TextEditingController(text: '0,00');
+  final _due = TextEditingController(text: formatDate(DateTime.now()));
+  final _paid = TextEditingController(text: formatDate(DateTime.now()));
+  ChargeUnit _feeUnit = ChargeUnit.percent;
+  ChargeUnit _interestUnit = ChargeUnit.percent;
+  Period _period = Period.day;
+  Calculation? _result;
+  String? _error;
 
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: _buildAppBar(),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.symmetric(horizontal: 16.0),
-        child: Form(
-          key: _formKey,
+  void dispose() {
+    for (final controller in [_money, _fee, _interest, _due, _paid]) {
+      controller.dispose();
+    }
+    super.dispose();
+  }
+
+  void _changed() => setState(() {
+    _result = null;
+    _error = null;
+  });
+
+  void _example() {
+    _form.currentState?.reset();
+    _money.text = '1.000,00';
+    _fee.text = '2,00';
+    _interest.text = '1,00';
+    _due.text = '28/02/2024';
+    _paid.text = '01/03/2024';
+    _resetOptions();
+  }
+
+  void _clear() {
+    _form.currentState?.reset();
+    _money.clear();
+    _fee.text = _interest.text = '0,00';
+    _due.text = _paid.text = formatDate(DateTime.now());
+    _resetOptions();
+  }
+
+  void _resetOptions() => setState(() {
+    _feeUnit = _interestUnit = ChargeUnit.percent;
+    _period = Period.day;
+    _result = null;
+    _error = null;
+  });
+
+  void _calculate() {
+    if (!_form.currentState!.validate()) return;
+    try {
+      final result = calculate(
+        Slip(
+          principal: parseDecimal(_money.text),
+          fee: parseDecimal(_fee.text),
+          interest: parseDecimal(_interest.text),
+          feeUnit: _feeUnit,
+          interestUnit: _interestUnit,
+          period: _period,
+          due: parseDate(_due.text),
+          paid: parseDate(_paid.text),
+        ),
+      );
+      setState(() {
+        _result = result;
+        _error = null;
+      });
+    } on ArgumentError catch (error) {
+      setState(() {
+        _result = null;
+        _error = error.message.toString();
+      });
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) => Scaffold(
+    appBar: AppBar(
+      title: const Text('Juros • boleto em dia'),
+      actions: [
+        IconButton(
+          tooltip: 'Alternar tema',
+          onPressed: widget.onTheme,
+          icon: const Icon(Icons.contrast),
+        ),
+        IconButton(
+          tooltip: 'Sobre o aplicativo',
+          icon: const Icon(Icons.info_outline),
+          onPressed: () => showAboutDialog(
+            context: context,
+            applicationName: 'Calculadora de Juros',
+            applicationVersion: '2.0.0',
+            applicationLegalese: '© 2020 Kleber de Oliveira Andrade · MIT',
+            children: [
+              const Text(
+                'Projeto didático. Simulação com juros compostos; confira as condições do seu boleto.',
+              ),
+            ],
+          ),
+        ),
+      ],
+    ),
+    body: SingleChildScrollView(
+      padding: const EdgeInsets.all(24),
+      child: Center(
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 1120),
           child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: <Widget>[
-              _buildTitle('Informações do boleto'),
-              _buildMoneyInputField(
-                'Valor do boleto',
-                controller: _controller.moneyController,
-                onSaved: (value) {
-                  _controller.paymentSlip.money =
-                      _controller.moneyController.numberValue;
-                },
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'Entenda cada centavo.',
+                style: Theme.of(context).textTheme.headlineLarge?.copyWith(
+                  fontWeight: FontWeight.w700,
+                ),
               ),
-              _buildDateInputField(
-                'Data de vencimento',
-                onSaved: (date) {
-                  _controller.paymentSlip.dueDate = date;
-                },
+              const SizedBox(height: 8),
+              const Text(
+                'Simule o pagamento em atraso e veja o valor original, a multa e os juros separados.',
               ),
-              _buildDateInputField(
-                'Data de pagamento',
-                onSaved: (date) {
-                  _controller.paymentSlip.payDate = date;
-                },
-              ),
-              _buildTitle('Multa'),
-              _buildMoneyInputField(
-                'Valor da multa',
-                controller: _controller.feeController,
-                onSaved: (value) {
-                  _controller.paymentSlip.feeValue =
-                      _controller.feeController.numberValue;
-                },
-              ),
-              _buildRateRadioButton(
-                context,
-                onChanged: (label) {
-                  print(label);
-                  _controller.paymentSlip.feeType = label;
-                },
-              ),
-              _buildTitle('Juros'),
-              _buildMoneyInputField(
-                'Valor do juros',
-                controller: _controller.interestController,
-                onSaved: (value) {
-                  _controller.paymentSlip.interestValue =
-                      _controller.interestController.numberValue;
-                },
-              ),
-              _buildRateRadioButton(
-                context,
-                onChanged: (label) {
-                  print(label);
-                  _controller.paymentSlip.interestType = label;
-                },
-              ),
-              _buildPeriodRadioButton(
-                context,
-                onChanged: (label) {
-                  print(label);
-                  _controller.paymentSlip.interestPeriod = label;
-                },
-              ),
-              _buildRoundedButton(
-                context,
-                label: 'CALCULAR',
-                padding: EdgeInsets.only(top: 32.0),
-                onTap: () {
-                  if (_formKey.currentState.validate()) {
-                    _formKey.currentState.save();
-                    var result = _controller.calculate();
-                    _showResultDialog(result);
+              const SizedBox(height: 24),
+              LayoutBuilder(
+                builder: (context, constraints) {
+                  final form = _buildForm();
+                  final summary = _buildSummary();
+                  if (constraints.maxWidth < 850) {
+                    return Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [form, const SizedBox(height: 24), summary],
+                    );
                   }
+                  return Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Expanded(flex: 3, child: form),
+                      const SizedBox(width: 24),
+                      Expanded(flex: 2, child: summary),
+                    ],
+                  );
                 },
               ),
-              _buildRoundedButton(
-                context,
-                label: 'LIMPAR',
-                padding: EdgeInsets.symmetric(vertical: 8.0),
-                onTap: () {
-                  setState(() {
-                    _controller.clear();
-                  });
-                },
-              )
+              const SizedBox(height: 24),
+              const Text(
+                'Simulação educativa • Não consulta bancos, não emite boletos e não salva seus dados.',
+              ),
             ],
           ),
         ),
       ),
-    );
-  }
+    ),
+  );
 
-  _buildAppBar() {
-    return AppBar(
-      title: Text('Calculadora de Juros'),
-      actions: <Widget>[
-        IconButton(
-          icon: Icon(Icons.lightbulb_outline),
-          onPressed: () {},
-        ),
-        IconButton(
-          icon: Icon(Icons.info),
-          onPressed: () {},
-        ),
-      ],
-    );
-  }
+  Widget _panel(Widget child) => Card(
+    margin: EdgeInsets.zero,
+    elevation: 0,
+    shape: RoundedRectangleBorder(
+      borderRadius: BorderRadius.circular(20),
+      side: BorderSide(color: Theme.of(context).colorScheme.outlineVariant),
+    ),
+    child: Padding(padding: const EdgeInsets.all(24), child: child),
+  );
 
-  _roundedInputDecoration() {
-    return OutlineInputBorder(
-      borderRadius: BorderRadius.circular(_inputFieldHeight * 0.5),
-    );
-  }
+  Widget _heading(String text) => Padding(
+    padding: const EdgeInsets.only(bottom: 16),
+    child: Text(
+      text,
+      style: Theme.of(
+        context,
+      ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w600),
+    ),
+  );
 
-  _buildTitle(String title, {double top = 16.0, double bottom = 8.0}) {
-    return Container(
-      padding: EdgeInsets.fromLTRB(0.0, top, 0.0, bottom),
-      child: Text(
-        title,
-        style: TextStyle(
-          color: Theme.of(context).primaryColor,
-          fontWeight: FontWeight.w500,
-        ),
-      ),
-    );
-  }
-
-  _buildMoneyInputField(String label,
-      {MoneyMaskedTextController controller, Function(String) onSaved}) {
-    return Container(
-      height: _inputFieldHeight,
-      padding: EdgeInsets.symmetric(vertical: 8.0),
-      child: TextFormField(
-        controller: controller,
-        keyboardType: TextInputType.number,
-        onSaved: onSaved,
-        decoration: InputDecoration(
-          labelText: label,
-          border: _roundedInputDecoration(),
-        ),
-      ),
-    );
-  }
-
-  _buildRateRadioButton(BuildContext context, {Function(dynamic) onChanged}) {
-    return CustomRadioButton(
-      enableShape: true,
-      elevation: 0,
-      buttonColor: Theme.of(context).canvasColor,
-      buttonLables: Constantes.rateLabels,
-      buttonValues: Constantes.rateLabels,
-      radioButtonValue: onChanged,
-      selectedColor: Theme.of(context).accentColor,
-    );
-  }
-
-  _buildPeriodRadioButton(BuildContext context, {Function(dynamic) onChanged}) {
-    return CustomRadioButton(
-      enableShape: true,
-      elevation: 0,
-      buttonColor: Theme.of(context).canvasColor,
-      buttonLables: Constantes.periodLabels,
-      buttonValues: Constantes.periodLabels,
-      radioButtonValue: onChanged,
-      selectedColor: Theme.of(context).accentColor,
-    );
-  }
-
-  _buildDateInputField(String label, {Function(DateTime) onSaved}) {
-    return Container(
-      height: _inputFieldHeight,
-      padding: EdgeInsets.symmetric(vertical: 8.0),
-      child: DateTimeField(
-        decoration: InputDecoration(
-          labelText: label,
-          border: _roundedInputDecoration(),
-        ),
-        format: _dateFormat,
-        initialValue: DateTime.now(),
-        onSaved: onSaved,
-        onShowPicker: (context, currentValue) {
-          return showDatePicker(
-            context: context,
-            firstDate: DateTime(1900),
-            initialDate: currentValue ?? DateTime.now(),
-            lastDate: DateTime(2100),
-          );
-        },
-      ),
-    );
-  }
-
-  _buildRoundedButton(BuildContext context,
-      {String label = '', Function onTap, EdgeInsets padding}) {
-    return Padding(
-      padding: padding,
-      child: InkWell(
-        child: Container(
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(_inputFieldHeight * 0.5),
-            color: Theme.of(context).primaryColor,
-          ),
-          height: _inputFieldHeight * 0.8,
-          child: Center(
-            child: Text(
-              label,
-              style: TextStyle(
-                color: Theme.of(context).canvasColor,
-                fontWeight: FontWeight.w500,
-              ),
+  Widget _buildForm() => _panel(
+    Form(
+      key: _form,
+      onChanged: _changed,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Align(
+            alignment: Alignment.centerRight,
+            child: TextButton.icon(
+              onPressed: _example,
+              icon: const Icon(Icons.auto_awesome_outlined),
+              label: const Text('Usar exemplo'),
             ),
           ),
-        ),
-        onTap: onTap,
-      ),
-    );
-  }
-
-  void _showResultDialog(ResultPaymentSlip result) {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text("Resultado"),
-          content: Column(
-            mainAxisAlignment: MainAxisAlignment.start,
-            mainAxisSize: MainAxisSize.min,
-            children: <Widget>[
-              _buildResultDialogRow('Atraso', '${result.days} ${_controller.paymentSlip.interestPeriod.toLowerCase()}(s)'),
-              _buildResultDialogRow('Juros', 'R\$ ${_moneyFormat.format(result.interest)}'),
-              _buildResultDialogRow('Multa', 'R\$ ${_moneyFormat.format(result.fee)}'),
-              SizedBox(height: 16),
-              Divider(height: 0.1),
-              SizedBox(height: 16),
-              _buildResultDialogRow('Total', 'R\$ ${_moneyFormat.format(result.value)}'),
+          _heading('01  Informações do boleto'),
+          _number(_money, 'Valor do boleto', 'R\$'),
+          const SizedBox(height: 16),
+          _date(_due, 'Data de vencimento'),
+          const SizedBox(height: 16),
+          _date(_paid, 'Data de pagamento'),
+          const SizedBox(height: 28),
+          _heading('02  Encargos por atraso'),
+          _number(
+            _fee,
+            'Multa única',
+            _feeUnit == ChargeUnit.percent ? '%' : 'R\$',
+          ),
+          _units('Unidade da multa', _feeUnit, (unit) {
+            _feeUnit = unit;
+            _changed();
+          }),
+          const SizedBox(height: 16),
+          _number(
+            _interest,
+            'Juros por período',
+            _interestUnit == ChargeUnit.percent ? '%' : 'R\$',
+          ),
+          _units('Unidade dos juros', _interestUnit, (unit) {
+            _interestUnit = unit;
+            _changed();
+          }),
+          const SizedBox(height: 12),
+          DropdownButtonFormField<Period>(
+            isExpanded: true,
+            initialValue: _period,
+            key: ValueKey(_period),
+            decoration: const InputDecoration(labelText: 'Período dos juros'),
+            items: const [
+              DropdownMenuItem(value: Period.day, child: Text('Diário')),
+              DropdownMenuItem(
+                value: Period.month,
+                child: Text(
+                  'Mensal (30 dias)',
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+            ],
+            onChanged: (value) {
+              _period = value!;
+              _changed();
+            },
+          ),
+          const SizedBox(height: 12),
+          const Text(
+            'Juros compostos sobre o valor original. Em R\$, o encargo vira uma taxa sobre esse valor. Percentuais: 0 a 100% por período.',
+          ),
+          const SizedBox(height: 24),
+          FilledButton.icon(
+            onPressed: _calculate,
+            icon: const Icon(Icons.calculate_outlined),
+            label: const Text('Calcular total'),
+          ),
+          const SizedBox(height: 8),
+          Wrap(
+            alignment: WrapAlignment.spaceBetween,
+            spacing: 8,
+            children: [
+              TextButton.icon(
+                onPressed: _clear,
+                icon: const Icon(Icons.restart_alt),
+                label: const Text('Limpar'),
+              ),
             ],
           ),
-        );
-      },
-    );
-  }
+        ],
+      ),
+    ),
+  );
 
-  _buildResultDialogRow(String label, String value) {
-    return Row(
-      mainAxisSize: MainAxisSize.max,
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: <Widget>[
-        Text(label, textAlign: TextAlign.left),
-        Text(value, textAlign: TextAlign.right),
+  Widget _number(TextEditingController controller, String label, String unit) =>
+      TextFormField(
+        controller: controller,
+        keyboardType: const TextInputType.numberWithOptions(decimal: true),
+        maxLength: 20,
+        decoration: InputDecoration(
+          labelText: label,
+          suffixText: unit,
+          hintText: '0,00',
+          counterText: '',
+        ),
+        validator: (text) {
+          try {
+            parseDecimal(text ?? '');
+            return null;
+          } on FormatException catch (error) {
+            return error.message;
+          }
+        },
+      );
+
+  Widget _date(TextEditingController controller, String label) => TextFormField(
+    controller: controller,
+    keyboardType: TextInputType.datetime,
+    decoration: InputDecoration(
+      labelText: label,
+      hintText: 'dd/mm/aaaa',
+      suffixIcon: IconButton(
+        tooltip: 'Selecionar $label',
+        icon: const Icon(Icons.calendar_today_outlined),
+        onPressed: () async {
+          DateTime initial;
+          try {
+            initial = parseDate(controller.text);
+          } on FormatException {
+            initial = DateTime.now();
+          }
+          final date = await showDatePicker(
+            context: context,
+            initialDate: initial,
+            firstDate: DateTime(1900),
+            lastDate: DateTime(2100, 12, 31),
+          );
+          if (date != null && mounted) {
+            controller.text = formatDate(date);
+            _changed();
+          }
+        },
+      ),
+    ),
+    validator: (text) {
+      try {
+        parseDate(text ?? '');
+        return null;
+      } on FormatException catch (error) {
+        return error.message;
+      }
+    },
+  );
+
+  Widget _units(
+    String label,
+    ChargeUnit selected,
+    ValueChanged<ChargeUnit> onChange,
+  ) => Padding(
+    padding: const EdgeInsets.only(top: 8),
+    child: Wrap(
+      spacing: 8,
+      children: ChargeUnit.values
+          .map(
+            (unit) => ChoiceChip(
+              tooltip:
+                  '$label: ${unit == ChargeUnit.percent ? 'porcentagem' : 'reais'}',
+              label: Text(
+                unit == ChargeUnit.percent ? 'Porcentagem' : 'Valor em R\$',
+              ),
+              selected: selected == unit,
+              onSelected: (_) => onChange(unit),
+            ),
+          )
+          .toList(),
+    ),
+  );
+
+  Widget _buildSummary() => Semantics(
+    liveRegion: true,
+    child: _panel(
+      Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          _heading('Resumo do pagamento'),
+          if (_error != null) ...[
+            Icon(
+              Icons.error_outline,
+              color: Theme.of(context).colorScheme.error,
+              size: 40,
+            ),
+            const SizedBox(height: 12),
+            Text(
+              _error!,
+              style: TextStyle(color: Theme.of(context).colorScheme.error),
+            ),
+          ] else if (_result case final result?) ...[
+            Text(
+              'TOTAL SIMULADO',
+              style: Theme.of(context).textTheme.labelLarge,
+            ),
+            const SizedBox(height: 8),
+            Text(
+              formatMoney(result.total),
+              style: Theme.of(context).textTheme.headlineLarge?.copyWith(
+                color: Theme.of(context).colorScheme.primary,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const SizedBox(height: 12),
+            Text('${result.days} dias de atraso · ${result.periods} períodos'),
+            const Divider(height: 40),
+            _line('Valor original', result.principal),
+            _line('Multa única', result.fee),
+            _line('Juros compostos', result.interest),
+            if (result.days == 0)
+              const Text('Pagamento até o vencimento: sem multa e sem juros.'),
+          ] else ...[
+            Icon(
+              Icons.receipt_long_outlined,
+              size: 48,
+              color: Theme.of(context).colorScheme.primary,
+            ),
+            const SizedBox(height: 20),
+            Text(
+              'Seu resumo aparece aqui',
+              style: Theme.of(context).textTheme.titleMedium,
+            ),
+            const SizedBox(height: 8),
+            const Text(
+              'Preencha o boleto ou use o exemplo e selecione Calcular total.',
+            ),
+          ],
+          const Divider(height: 40),
+          const Text(
+            'Como calculamos',
+            style: TextStyle(fontWeight: FontWeight.bold),
+          ),
+          const SizedBox(height: 8),
+          const Text(
+            '• Dias corridos, sem contar o vencimento.\n• Multa cobrada uma vez, só em atraso.\n• Mês = 30 dias completos, sem proporcionalidade.\n• Cada encargo é arredondado ao centavo, uma vez.\n• Máximo de 3.660 dias de atraso.',
+          ),
+        ],
+      ),
+    ),
+  );
+
+  Widget _line(String label, int cents) => Padding(
+    padding: const EdgeInsets.only(bottom: 16),
+    child: Wrap(
+      alignment: WrapAlignment.spaceBetween,
+      spacing: 16,
+      runSpacing: 4,
+      children: [
+        Text(label),
+        Text(
+          formatMoney(cents),
+          style: const TextStyle(fontWeight: FontWeight.w600),
+        ),
       ],
-    );
-  }
+    ),
+  );
 }
