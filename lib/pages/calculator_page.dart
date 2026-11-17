@@ -1,4 +1,5 @@
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
+
 import '../domain/calculation.dart';
 import '../domain/input.dart';
 
@@ -124,9 +125,8 @@ class _CalculatorPageState extends State<CalculatorPage> {
             children: [
               Text(
                 'Entenda cada centavo.',
-                style: Theme.of(context).textTheme.headlineLarge?.copyWith(
-                  fontWeight: FontWeight.w700,
-                ),
+                style: Theme.of(context).textTheme.headlineLarge
+                    ?.copyWith(fontWeight: FontWeight.w700),
               ),
               const SizedBox(height: 8),
               const Text(
@@ -178,9 +178,8 @@ class _CalculatorPageState extends State<CalculatorPage> {
     padding: const EdgeInsets.only(bottom: 16),
     child: Text(
       text,
-      style: Theme.of(
-        context,
-      ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w600),
+      style: Theme.of(context).textTheme.titleLarge
+          ?.copyWith(fontWeight: FontWeight.w600),
     ),
   );
 

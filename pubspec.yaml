@@ -4,15 +4,16 @@ publish_to: none
 version: 2.0.0+2
 
 environment:
-  sdk: '>=3.11.0 <4.0.0'
-  flutter: '>=3.41.0'
+  sdk: '>=3.14.0 <4.0.0'
+  flutter: '>=3.50.0'
 
 dependencies:
-  cupertino_icons: ^1.0.9
+  cupertino_icons: ^2.0.0
   flutter:
     sdk: flutter
   flutter_localizations:
     sdk: flutter
+  material_ui: ^1.11.1
 
 dev_dependencies:
   flutter_test:
@@ -21,3 +22,9 @@ dev_dependencies:
 
 flutter:
   uses-material-design: true
+
+# Patch upgrades ahead of Flutter 3.50.0's SDK pins.
+# Validated by this application's tests/builds; remove when the SDK catches up.
+dependency_overrides:
+  material_color_utilities: 0.13.1
+  test_api: 0.7.15
