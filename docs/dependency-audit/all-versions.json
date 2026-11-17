@@ -161,8 +161,48 @@
       }
     },
     {
+      "package": "file",
+      "kind": "transitive",
+      "isDiscontinued": false,
+      "replacedBy": null,
+      "isCurrentRetracted": false,
+      "isCurrentAffectedByAdvisory": false,
+      "current": {
+        "version": "7.0.1"
+      },
+      "upgradable": {
+        "version": "7.0.1"
+      },
+      "resolvable": {
+        "version": "7.0.1"
+      },
+      "latest": {
+        "version": "7.0.1"
+      }
+    },
+    {
       "package": "flutter",
       "kind": "direct",
+      "isDiscontinued": false,
+      "replacedBy": null,
+      "isCurrentRetracted": false,
+      "isCurrentAffectedByAdvisory": false,
+      "current": {
+        "version": "0.0.0"
+      },
+      "upgradable": {
+        "version": "0.0.0"
+      },
+      "resolvable": {
+        "version": "0.0.0"
+      },
+      "latest": {
+        "version": "0.0.0"
+      }
+    },
+    {
+      "package": "flutter_driver",
+      "kind": "transitive",
       "isDiscontinued": false,
       "replacedBy": null,
       "isCurrentRetracted": false,
@@ -222,6 +262,46 @@
     },
     {
       "package": "flutter_test",
+      "kind": "dev",
+      "isDiscontinued": false,
+      "replacedBy": null,
+      "isCurrentRetracted": false,
+      "isCurrentAffectedByAdvisory": false,
+      "current": {
+        "version": "0.0.0"
+      },
+      "upgradable": {
+        "version": "0.0.0"
+      },
+      "resolvable": {
+        "version": "0.0.0"
+      },
+      "latest": {
+        "version": "0.0.0"
+      }
+    },
+    {
+      "package": "fuchsia_remote_debug_protocol",
+      "kind": "transitive",
+      "isDiscontinued": false,
+      "replacedBy": null,
+      "isCurrentRetracted": false,
+      "isCurrentAffectedByAdvisory": false,
+      "current": {
+        "version": "0.0.0"
+      },
+      "upgradable": {
+        "version": "0.0.0"
+      },
+      "resolvable": {
+        "version": "0.0.0"
+      },
+      "latest": {
+        "version": "0.0.0"
+      }
+    },
+    {
+      "package": "integration_test",
       "kind": "dev",
       "isDiscontinued": false,
       "replacedBy": null,
@@ -465,6 +545,46 @@
       }
     },
     {
+      "package": "platform",
+      "kind": "transitive",
+      "isDiscontinued": false,
+      "replacedBy": null,
+      "isCurrentRetracted": false,
+      "isCurrentAffectedByAdvisory": false,
+      "current": {
+        "version": "3.2.0"
+      },
+      "upgradable": {
+        "version": "3.2.0"
+      },
+      "resolvable": {
+        "version": "3.2.0"
+      },
+      "latest": {
+        "version": "3.2.0"
+      }
+    },
+    {
+      "package": "process",
+      "kind": "transitive",
+      "isDiscontinued": false,
+      "replacedBy": null,
+      "isCurrentRetracted": false,
+      "isCurrentAffectedByAdvisory": false,
+      "current": {
+        "version": "5.0.6"
+      },
+      "upgradable": {
+        "version": "5.0.6"
+      },
+      "resolvable": {
+        "version": "5.0.6"
+      },
+      "latest": {
+        "version": "5.0.6"
+      }
+    },
+    {
       "package": "sky_engine",
       "kind": "transitive",
       "isDiscontinued": false,
@@ -565,6 +685,26 @@
       }
     },
     {
+      "package": "sync_http",
+      "kind": "transitive",
+      "isDiscontinued": false,
+      "replacedBy": null,
+      "isCurrentRetracted": false,
+      "isCurrentAffectedByAdvisory": false,
+      "current": {
+        "version": "0.3.1"
+      },
+      "upgradable": {
+        "version": "0.3.1"
+      },
+      "resolvable": {
+        "version": "0.3.1"
+      },
+      "latest": {
+        "version": "0.3.1"
+      }
+    },
+    {
       "package": "term_glyph",
       "kind": "transitive",
       "isDiscontinued": false,
@@ -646,6 +786,46 @@
       },
       "latest": {
         "version": "15.4.0"
+      }
+    },
+    {
+      "package": "web",
+      "kind": "transitive",
+      "isDiscontinued": false,
+      "replacedBy": null,
+      "isCurrentRetracted": false,
+      "isCurrentAffectedByAdvisory": false,
+      "current": {
+        "version": "1.1.2"
+      },
+      "upgradable": {
+        "version": "1.1.2"
+      },
+      "resolvable": {
+        "version": "1.1.2"
+      },
+      "latest": {
+        "version": "1.1.2"
+      }
+    },
+    {
+      "package": "webdriver",
+      "kind": "transitive",
+      "isDiscontinued": false,
+      "replacedBy": null,
+      "isCurrentRetracted": false,
+      "isCurrentAffectedByAdvisory": false,
+      "current": {
+        "version": "3.2.0"
+      },
+      "upgradable": {
+        "version": "3.2.0"
+      },
+      "resolvable": {
+        "version": "3.2.0"
+      },
+      "latest": {
+        "version": "3.2.0"
       }
     }
   ]

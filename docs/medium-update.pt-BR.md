@@ -22,7 +22,7 @@ flutter run -d chrome
 
 O projeto não precisa de Firebase, banco de dados, cadastro ou chave de API. Os dados são fictícios e ficam somente na memória do aplicativo. Recarregar a página reinicia o estado.
 
-As dependências diretas atuais são flutter e flutter_localizations do SDK 3.50.0, cupertino_icons 2.0.0, material_ui 1.11.1, flutter_test do mesmo SDK e flutter_lints 6.0.0. Os ícones Cupertino atendem aos componentes nativos; as traduções de calendários e diálogos vêm da localização do Flutter; flutter_lints e flutter_test ajudam a verificar o código.
+As dependências diretas atuais são flutter e flutter_localizations do SDK 3.50.0, cupertino_icons 2.0.0, material_ui 1.11.1, flutter_test e integration_test do mesmo SDK e flutter_lints 6.0.0. Os ícones Cupertino atendem aos componentes nativos; as traduções de calendários e diálogos vêm da localização do Flutter. flutter_test verifica domínio e widgets; integration_test executa os fluxos no simulador com o aplicativo nativo.
 
 ```yaml
 environment:
@@ -39,6 +39,8 @@ dependencies:
 
 dev_dependencies:
   flutter_test:
+    sdk: flutter
+  integration_test:
     sdk: flutter
   flutter_lints: ^6.0.0
 
@@ -179,14 +181,14 @@ Salve um teste semelhante em test/ e execute a verificação completa:
 
 ```sh
 flutter pub get --enforce-lockfile
-dart format --output=none --set-exit-if-changed lib test tool
+dart format --output=none --set-exit-if-changed lib test integration_test tool
 flutter analyze
 flutter test --coverage
 flutter build web --release
 flutter pub outdated
 ```
 
-A execução de teste não substitui a conferência de um cálculo independente. Cobertura de linhas mostra o que foi executado, não prova que todas as regras foram verificadas. As versões usadas no CI estão registradas no repositório, e a pasta build/web é o resultado do build Web; isso não publica automaticamente um site.
+A execução de teste não substitui a conferência de um cálculo independente. Cobertura de linhas mostra o que foi executado, não prova que todas as regras foram verificadas. As versões usadas no CI estão registradas no repositório, e a pasta build/web é o resultado do build Web; isso não publica automaticamente um site. No macOS, confira o identificador do simulador em flutter devices e execute flutter test integration_test/calculator_test.dart -d <simulator-udid>. Essa verificação passou no iPhone 17 simulado com iOS 27.2 e Xcode 27.2, confirmando cálculo, erro, remoção de resultado antigo, limpeza e tema. A compilação iOS de release sem assinatura também passou; ela verifica o alvo de dispositivo, sem produzir uma distribuição assinada. O README contém o comando completo dessa compilação.
 
 ## Código completo, créditos e histórico
 
@@ -194,7 +196,7 @@ O código atual, as versões resolvidas, a auditoria de dependências e os limit
 
 Esta aula nasceu em 2020 na disciplina de Programação Mobile. O material histórico, os links úteis e as imagens antigas estão preservados em docs/original-lesson.md no mesmo repositório. Como referência da apresentação original, permanece o vídeo da Carol sobre juros e multas: https://www.youtube.com/watch?v=ln5quWCXmOk. Os comandos e códigos para executar a revisão atual são os desta versão do artigo.
 
-A capa é uma ilustração editorial criada com auxílio de IA para esta revisão; as imagens da interface são capturas reais do aplicativo Web. Não representam teste físico em Android ou iPhone. O README registra separadamente os resultados de análise, testes e builds por plataforma, incluindo limites de iOS que não foram resolvidos nesta máquina.
+A capa é uma ilustração editorial criada com auxílio de IA para esta revisão; as imagens da interface são capturas reais do aplicativo Web. Não representam teste físico em Android ou iPhone. O README registra separadamente os resultados por plataforma: o build de simulador, o teste de integração no iOS 27.2 e o build iOS de release sem assinatura passaram. Distribuição assinada e teste em aparelho físico continuam fora dessa verificação.
 
 ## Cinco exercícios para praticar
 

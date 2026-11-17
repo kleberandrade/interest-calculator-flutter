@@ -28,5 +28,8 @@
     true,
     true
   ],
-  "newsletter_sent": false
+  "newsletter_sent": false,
+  "ios_validation_published": true,
+  "ios_test_runtime": "iPhone 17 simulator / iOS 27.2 / Xcode 27.2",
+  "ios_unsigned_release_build": "passed"
 }

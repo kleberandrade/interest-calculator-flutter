@@ -1,6 +1,6 @@
 # Current verification — Flutter 3.50.0
 
-On 17 November 2026, upgraded to Flutter 3.50.0 / Dart 3.14.0 in an isolated SDK copy and migrated the deprecated Material imports/localization to material_ui 1.11.1. All 32 hosted packages in the registry audit match their latest stable versions; two explicit SDK-pin patch overrides are documented in dependencies.md.
+On 17 November 2026, upgraded to Flutter 3.50.0 / Dart 3.14.0 in an isolated SDK copy and migrated the deprecated Material imports/localization to material_ui 1.11.1. All 34 hosted packages in the updated registry audit match their latest stable versions; the other seven dependencies are SDK packages; two explicit SDK-pin patch overrides are documented in dependencies.md.
 
 - Lockfile enforcement, formatting and analyzer passed.
 - All 12 application/domain/widget tests passed, including 360px with 1.5× text.
@@ -8,7 +8,11 @@ On 17 November 2026, upgraded to Flutter 3.50.0 / Dart 3.14.0 in an isolated SDK
 - The committed tool/lesson_example.dart ran and printed principal R$ 1.000,00, fee R$ 20,00, compound interest R$ 20,10 and total R$ 1.040,10.
 - Web release build passed with the full updated dependency graph. Reopened its actual Chrome bundle and confirmed the example; captured a new desktop screenshot and a 390×844 result screenshot under docs/images/.
 - Android initially rejected the old Gradle configuration. Updated to the Flutter 3.50 template (Gradle 9.5.0, AGP 9.3.1, Kotlin 2.4.20), preserved the application ID, and built a debug APK successfully with JDK 21. No dependency-validation bypass or SDK-license acceptance was used.
-- iOS was not rebuilt in this follow-up. The earlier failures below remain the verified limits; no phone/emulator runtime test is claimed.
+- iOS simulator debug build passed with Flutter 3.50.0, Xcode 27.2 (27B52), macOS 27.2.1 arm64 and iOS 27.2. The original bundle identifier and iOS 15 minimum were preserved.
+- Added the SDK `integration_test` dependency and committed Flutter's generated Swift Package Manager project/scheme integration. `flutter test integration_test/calculator_test.dart -d <dedicated-simulator-udid>` installed and launched the real app on a dedicated iPhone 17 simulator. The native scenario passed: R$ 1.040,10 total, R$ 20,10 interest, two overdue days, stale result removal, negative input error, reset and a verified theme change. This is a simulator run, not a physical iPhone test or an XCTest-suite claim.
+- `flutter build ios --release --no-codesign` passed and produced `build/ios/iphoneos/Runner.app` (17.3 MB). This verifies device-target compilation only: no signed archive, provisioning change, physical-device installation or App Store upload was performed.
+- CI now has an independent `ios` job on macOS 26 / Xcode 26.6: enforced lockfile, unsigned release build and the integration scenario on its own iPhone 17 / iOS 26.5 simulator. Both platforms run on pushes to `master` and pull requests; there is no deployment.
+- The first run with the new native bridge exited with Xcode status 255 while free disk space was critically low. It did not reach the test and is not counted as a pass. After removing only this task's generated files and repeating with verbose diagnostics, native build and integration testing passed. No shared SDK, other project's simulator or signing account was changed.
 
 ## Earlier verification history
 
@@ -18,7 +22,7 @@ The following notes describe the earlier Flutter 3.41.9 modernization, retained 
 
 Environment inspected on 17 November 2026: Flutter 3.41.9 stable, Dart 3.11.5, macOS arm64, Chrome, Xcode with iOS Simulator SDK 27.2, and installed Android SDK/JDK 21. The Flutter SDK used for commands was an isolated filesystem clone; the shared SDK was not upgraded or modified.
 
-## Checks performed
+### Earlier checks performed
 
 - Dependency resolution and lockfile enforcement succeeded. Several SDK-pinned transitive packages have newer versions; overriding SDK constraints would not be an honest toolchain upgrade.
 - Formatting check and `flutter analyze` passed.

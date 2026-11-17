@@ -21,7 +21,7 @@ flutter pub get --enforce-lockfile
 flutter run -d chrome
 ```
 
-For Android, install the Flutter-compatible Android SDK and JDK 21. The generated host uses Java 17 bytecode, Kotlin 2.4.20, Android Gradle Plugin 8.11.1 and Gradle 9.5.0. For iOS, use macOS/Xcode and iOS 15 or later. A physical-device distribution build needs your own signing configuration. Android release configuration currently uses the template's debug key for local experiments; configure your own key before distribution. Nothing in this project publishes an app.
+For Android, install the Flutter-compatible Android SDK and JDK 21. The generated host uses Java 17 bytecode, Kotlin 2.4.20, Android Gradle Plugin 9.3.1 and Gradle 9.5.0. For iOS, use macOS/Xcode and iOS 15 or later. A physical-device distribution build needs your own signing configuration. Android release configuration currently uses the template's debug key for local experiments; configure your own key before distribution. Nothing in this project publishes an app.
 
 ## Try it
 
@@ -53,13 +53,14 @@ Independent examples: R$ 1,000.00 at 1% daily for two days produces `1000 × (1.
 - `lib/pages/calculator_page.dart`: form lifecycle, date pickers, validation, examples, reset and result presentation. Controllers are disposed.
 - `lib/main.dart`: Portuguese localization, theme state and application entry point.
 - `test/`: independently calculated fixtures, boundary/date tests and user interaction/layout tests.
+- `integration_test/`: the same application running on a native simulator, exercising calculation, invalid input, reset and theme changes.
 - `web/`, `android/`, `ios/`: platform hosts. No remote services or persisted financial data.
 
 ## Tests and builds
 
 ```sh
 flutter pub get --enforce-lockfile
-dart format --output=none --set-exit-if-changed lib test tool
+dart format --output=none --set-exit-if-changed lib test integration_test tool
 flutter analyze
 flutter test --coverage
 flutter build web --release
@@ -67,9 +68,19 @@ python3 -m http.server 8788 --bind 127.0.0.1 --directory build/web
 # Open http://127.0.0.1:8788
 ```
 
-The `Flutter CI` workflow runs those Flutter checks on pushes to `master` and pull requests, and uploads the Web bundle and LCOV coverage. There is no automatic deployment. Flutter's default Web build can retrieve engine/font resources from its configured CDN at runtime, so an initial connection is required; offline installation is not promised.
+The `Flutter CI` workflow runs those Flutter checks on pushes to `master` and pull requests, and uploads the Web bundle and LCOV coverage. A separate macOS 26 job uses Xcode 26.6, builds an unsigned iOS release, and runs the native calculator integration test on a dedicated iPhone 17 / iOS 26.5 simulator. The simulator is removed after the run. There is no automatic deployment. Flutter's default Web build can retrieve engine/font resources from its configured CDN at runtime, so an initial connection is required; offline installation is not promised.
 
-Local verification: 12 tests passed, including a 360px layout with 1.5× text. Both domain files had every executable line covered in the generated LCOV report; this is not a branch-coverage or mutation-score claim. Analyzer and release Web build passed. Chrome interaction checks covered the example, invalid negative amount, stale-result clearing, reset, theme switching, and a real 390px viewport. Screenshots are actual browser captures, not phone tests. See [validation notes](docs/validation.md) for mobile build results and tooling limits.
+To repeat the native iOS check on macOS, select an installed simulator from `flutter devices` (or create/boot one in Xcode), then use its exact identifier:
+
+```sh
+flutter build ios --simulator --debug
+flutter test integration_test/calculator_test.dart -d <simulator-udid>
+flutter build ios --release --no-codesign
+```
+
+The unsigned release checks device compilation; it is not an installable signed archive or an App Store submission. See [the runner image inventory](https://github.com/actions/runner-images/blob/main/images/macos/macos-26-arm64-Readme.md) for the CI toolchain.
+
+Local verification: 12 tests passed, including a 360px layout with 1.5× text. Both domain files had every executable line covered in the generated LCOV report; this is not a branch-coverage or mutation-score claim. Analyzer and release Web build passed. Chrome interaction checks covered the example, invalid negative amount, stale-result clearing, reset, theme switching, and a real 390px viewport. The additional native integration scenario passed on an iPhone 17 / iOS 27.2 simulator with Xcode 27.2; simulator debug and unsigned device release builds also passed. Screenshots remain actual browser captures; no physical phone test is claimed. See [validation notes](docs/validation.md) for mobile build results and tooling limits.
 
 ## Migration from the 2020 lesson
 
