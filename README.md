@@ -1,17 +1,17 @@
 # Interest Calculator
 
-[![Flutter 3.41.9](https://img.shields.io/badge/Flutter-3.41.9-02569B)](https://docs.flutter.dev/)
-[![Dart 3.11.5](https://img.shields.io/badge/Dart-3.11.5-0175C2)](https://dart.dev/)
+[![Flutter 3.50.0](https://img.shields.io/badge/Flutter-3.50.0-02569B)](https://docs.flutter.dev/)
+[![Dart 3.14.0](https://img.shields.io/badge/Dart-3.14.0-0175C2)](https://dart.dev/)
 [![MIT license](https://img.shields.io/badge/License-MIT-green)](LICENSE)
 [![Flutter CI](https://github.com/kleberandrade/interest-calculator-flutter/actions/workflows/ci.yml/badge.svg?branch=master)](https://github.com/kleberandrade/interest-calculator-flutter/actions/workflows/ci.yml)
 
 A Portuguese classroom app for exploring **compound interest on overdue payment slips**, created by **Kleber de Oliveira Andrade**. Enter the original amount, due/payment dates, one-time fee and interest per day or completed 30-day month. See every charge separately in a responsive, accessible Material interface.
 
-![Actual Chrome Web interface](docs/screenshots/web-desktop.jpg)
+![Actual Chrome Web interface](docs/images/flutter350-desktop.jpg)
 
 ## Requirements and installation
 
-Use **Flutter 3.41.9 stable**, which includes **Dart 3.11.5**, and Chrome for the verified Web workflow. Keep `pubspec.lock` committed. No account, database, Firebase setup, credentials or API keys are required.
+Use **Flutter 3.50.0 stable**, which includes **Dart 3.14.0**, and Chrome for the verified Web workflow. Keep `pubspec.lock` committed. No account, database, Firebase setup, credentials or API keys are required.
 
 ```sh
 git clone https://github.com/kleberandrade/interest-calculator-flutter.git
@@ -21,7 +21,7 @@ flutter pub get --enforce-lockfile
 flutter run -d chrome
 ```
 
-For Android, install the Flutter-compatible Android SDK and JDK 17 or 21. The generated host uses Java 17 bytecode, Kotlin 2.2.20, Android Gradle Plugin 8.11.1 and Gradle 8.14. For iOS, use macOS/Xcode and iOS 15 or later. A physical-device distribution build needs your own signing configuration. Android release configuration currently uses the template's debug key for local experiments; configure your own key before distribution. Nothing in this project publishes an app.
+For Android, install the Flutter-compatible Android SDK and JDK 21. The generated host uses Java 17 bytecode, Kotlin 2.4.20, Android Gradle Plugin 8.11.1 and Gradle 9.5.0. For iOS, use macOS/Xcode and iOS 15 or later. A physical-device distribution build needs your own signing configuration. Android release configuration currently uses the template's debug key for local experiments; configure your own key before distribution. Nothing in this project publishes an app.
 
 ## Try it
 
@@ -59,7 +59,7 @@ Independent examples: R$ 1,000.00 at 1% daily for two days produces `1000 × (1.
 
 ```sh
 flutter pub get --enforce-lockfile
-dart format --output=none --set-exit-if-changed lib test
+dart format --output=none --set-exit-if-changed lib test tool
 flutter analyze
 flutter test --coverage
 flutter build web --release
@@ -73,7 +73,7 @@ Local verification: 12 tests passed, including a 360px layout with 1.5× text. B
 
 ## Migration from the 2020 lesson
 
-Dart 2 mutable `PaymentSlip`/`ResultPaymentSlip` and the UI-coupled `Controller` have been replaced by the pure domain above. These were internal classroom classes, not a published API. The percentage/reais and day/month options remain. The unfinished clear/theme/about actions now work. Portrait locking is removed for responsive Web and landscape layouts. The old packages `flutter_masked_text`, `datetime_picker_formfield` and `custom_radio_grouped_button` are removed; Flutter's own fields, date picker, chips and dropdown replace them. `intl` remains an SDK localization transitive dependency, not a financial parser. `cupertino_icons` supplies the native icon font used by SDK widgets.
+Dart 2 mutable `PaymentSlip`/`ResultPaymentSlip` and the UI-coupled `Controller` have been replaced by the pure domain above. These were internal classroom classes, not a published API. The percentage/reais and day/month options remain. The unfinished clear/theme/about actions now work. Portrait locking is removed for responsive Web and landscape layouts. The old packages `flutter_masked_text`, `datetime_picker_formfield` and `custom_radio_grouped_button` are removed; Flutter's own fields, date picker, chips and dropdown replace them. `intl` 0.20.3 remains an SDK localization transitive dependency, not a financial parser. `cupertino_icons` 2.0.0 supplies the native icon font used by SDK widgets. `flutter_lints` 6.0.0 is the current stable lint package. Material components and localization now come from the official `material_ui` 1.11.1 package (with transitive `cupertino_ui` 1.1.7), following Flutter 3.50’s design-library migration. See [the complete dependency audit](docs/dependencies.md) for every resolved version and the two explicit SDK-pin patch overrides.
 
 Android uses the declarative Kotlin Gradle configuration and Flutter v2 embedding. iOS uses the current scene-based template with the original bundle identifier and an iOS 15 minimum. No stored user data requires migration. Exact rounding and calendar days can differ from the old double/time-of-day calculation; these intentional corrections are tested and documented above.
 
@@ -81,4 +81,4 @@ Android uses the declarative Kotlin Gradle configuration and Flutter v2 embeddin
 
 Read the [original Portuguese Medium tutorial](https://medium.com/flutter-comunidade-br/desenvolvimento-de-uma-calculadora-de-juros-para-boletos-vencidos-44ab70fcf0cd), the [preserved 2020 classroom notes and screenshots](docs/original-lesson.md), the [current demo guide](docs/demo.md), and the [modernization log](docs/work-log.md). Historical dependency snippets are not the installation instructions for this version.
 
-MIT © 2020 Kleber de Oliveira Andrade. The original README's MIT grant is preserved in [LICENSE](LICENSE). Flutter/Dart and bundled components retain their own notices; **Sobre o aplicativo → Ver licenças** displays Flutter's license registry. No third-party tutorial or image is relicensed by this repository.
+MIT © 2020 Kleber de Oliveira Andrade. The original README's MIT grant is preserved in [LICENSE](LICENSE). Flutter/Dart and bundled components retain their own notices; **Sobre o aplicativo → Acessar licenças** displays Flutter's license registry. No third-party tutorial or image is relicensed by this repository.

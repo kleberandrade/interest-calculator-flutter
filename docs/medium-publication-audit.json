@@ -1,0 +1,32 @@
+{
+  "url": "https://medium.com/flutter-comunidade-br/desenvolvimento-de-uma-calculadora-de-juros-para-boletos-vencidos-44ab70fcf0cd?postPublishedType=repub",
+  "codeBlocks": 7,
+  "exercises": 5,
+  "hasMarkers": false,
+  "images": [
+    {
+      "alt": "Ilustração editorial em verde e creme com o título Juros de boletos, uma calculadora, um boleto vencido, um calendário e moedas.",
+      "src": "https://miro.medium.com/v2/resize:fit:700/1*-kOhBsCSv0x6thjmt07YCQ.png"
+    },
+    {
+      "alt": "Interface da calculadora de juros no Chrome. À esquerda, boleto de R$ 1.000,00, multa de 2% e juros de 1% ao dia; à direita, resumo de dois dias de atraso com total de R$ 1.040,10.",
+      "src": "https://miro.medium.com/v2/resize:fit:700/1*l1afp9EFCPP-4LoIL4FBSw.jpeg"
+    },
+    {
+      "alt": "Resumo da calculadora no Chrome em largura de 390 pixels: total de R$ 1.040,10, composto por R$ 1.000,00 de principal, R$ 20,00 de multa e R$ 20,10 de juros.",
+      "src": "https://miro.medium.com/v2/resize:fit:390/1*VHfQv8qfrpqDOypJJV10mA.jpeg"
+    }
+  ],
+  "lastHeading": "Cinco exercícios para praticar",
+  "verified_on": "2026-11-17",
+  "code_matches_source_ignoring_blank_lines": [
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true
+  ],
+  "newsletter_sent": false
+}
